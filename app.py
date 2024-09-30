@@ -3,7 +3,7 @@ import numpy as np
 import joblib
 import os
 
-# Load the XGBoost model (without scaler since it wasn't used in Jupyter)
+# Load the XGBoost model
 @st.cache_resource
 def load_model():
     model_path = "xgb_model.pkl"
@@ -16,16 +16,16 @@ def load_model():
 
 model = load_model()
 
-# Prediction function for 3 features (without scaler)
+# Prediction function (with hardcoded test)
 def predict_carbon_emissions(energy_consumption, gdp_ppp, energy_gdp_interaction):
-    # Create a data array for the input features
-    input_data = np.array([[energy_consumption, gdp_ppp, energy_gdp_interaction]])
+    # Hardcoded test input data to rule out issues with inputs
+    input_data = np.array([[25100, 52000, 15000]])  # Test this data instead of passed inputs
 
     # Debugging: Inspect input before prediction
-    st.write("Input data for prediction:", input_data)
+    st.write("Input data for prediction (hardcoded for test):", input_data)
 
     if model is not None:
-        # Make a prediction using the model
+        # Make prediction using the model
         prediction = model.predict(input_data)[0]
 
         # Debugging: Inspect raw prediction output
@@ -34,15 +34,6 @@ def predict_carbon_emissions(energy_consumption, gdp_ppp, energy_gdp_interaction
         return prediction
     else:
         return None
-
-# Function to interpret the impact levels based on prediction
-def interpret_impact(prediction):
-    if prediction < 5:
-        return "Safe: Emission levels are within sustainable limits."
-    elif 5 <= prediction < 10:
-        return "Moderate: Emissions may cause noticeable environmental impact."
-    else:
-        return "Unsafe: Emissions are too high, leading to severe consequences."
 
 # Streamlit App layout
 st.title("Carbon Emissions Prediction")
@@ -58,13 +49,11 @@ energy_gdp_interaction = st.number_input("Energy-GDP Interaction (combined metri
 
 # Predict button
 if st.button("Predict Carbon Emissions"):
-    # Make the prediction with 3 features
+    # Make the prediction with hardcoded inputs for testing
     prediction = predict_carbon_emissions(energy_consumption, gdp_ppp, energy_gdp_interaction)
 
     if prediction is not None:
-        impact_text = interpret_impact(prediction)
         st.subheader(f"Predicted Per Capita Carbon Emissions: {prediction:.2f} tons/year")
-        st.write(impact_text)
     else:
         st.error("Prediction failed. Please ensure the model is loaded correctly.")
 

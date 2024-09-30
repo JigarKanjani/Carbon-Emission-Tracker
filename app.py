@@ -28,9 +28,9 @@ def interpret_impact(prediction):
     else:
         return "Unsafe: Emissions are too high, leading to severe consequences."
 
-# Prediction function
-def predict_carbon_emissions(input_features):
-    input_data = np.array([input_features])
+# Prediction function for 3 features
+def predict_carbon_emissions(energy_consumption, gdp_ppp, energy_gdp_interaction):
+    input_data = np.array([[energy_consumption, gdp_ppp, energy_gdp_interaction]])
     
     # Debugging: Inspect input before scaling
     st.write("Input data before scaling:", input_data)
@@ -59,25 +59,15 @@ st.write("""
 Enter your energy consumption, GDP, and energy-GDP interaction to predict per capita carbon emissions.
 """)
 
-# Input fields for all 7 features
-total_population = st.number_input("Total Population", value=1000000)
-gdp_ppp = st.number_input("Per Capita GDP (PPP USD/year)", value=52000)
+# Input fields for 3 features
 energy_consumption = st.number_input("Per Capita Energy (kWh/year)", value=25100)
-carbon_emissions = st.number_input("Per Capita Carbon Emissions (tonnes)", value=5)
-log_per_capita_emissions = st.number_input("Log Per Capita Emissions", value=0.7)
-energy_gdp_interaction = st.number_input("Energy-GDP Interaction", value=15000)
-emissions_pop_interaction = st.number_input("Emissions-Pop Interaction", value=2)
+gdp_ppp = st.number_input("Per Capita GDP (PPP USD/year)", value=52000)
+energy_gdp_interaction = st.number_input("Energy-GDP Interaction (combined metric)", value=15000)
 
 # Predict button
 if st.button("Predict Carbon Emissions"):
-    # Collect all 7 input features
-    input_features = [
-        total_population, gdp_ppp, energy_consumption, carbon_emissions,
-        log_per_capita_emissions, energy_gdp_interaction, emissions_pop_interaction
-    ]
-    
-    # Make the prediction
-    prediction = predict_carbon_emissions(input_features)
+    # Make the prediction with 3 features
+    prediction = predict_carbon_emissions(energy_consumption, gdp_ppp, energy_gdp_interaction)
     
     if prediction is not None:
         impact_text = interpret_impact(prediction)

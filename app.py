@@ -1,15 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
-pip install streamlit
-
-
-# In[3]:
-
-
 import streamlit as st
 import numpy as np
 import joblib

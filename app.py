@@ -4,7 +4,7 @@ import joblib
 import os
 
 # Load the model from the pkl file
-@st.cache_resource  # Use caching to avoid reloading the model each time
+@st.cache_resource
 def load_model():
     model_path = "xgb_model.pkl"
     if os.path.exists(model_path):
@@ -20,8 +20,11 @@ def predict_carbon_emissions(energy_consumption, gdp_ppp, energy_gdp_interaction
     if model is not None:
         # Create a data array for the input features
         input_data = np.array([[energy_consumption, gdp_ppp, energy_gdp_interaction]])
+        st.write("Input data for prediction: ", input_data)  # Debugging log
+        
         # Make a prediction using the model
         prediction = model.predict(input_data)[0]  # Get the first value of prediction
+        st.write("Raw prediction output from model: ", prediction)  # Debugging log
         return prediction
     else:
         return None

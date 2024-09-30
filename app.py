@@ -19,7 +19,7 @@ def load_model_and_scaler():
 
 model, scaler = load_model_and_scaler()
 
-# Function to interpret impact levels
+# Function to interpret the impact levels based on prediction
 def interpret_impact(prediction):
     if prediction < 5:
         return "Safe: Emission levels are within sustainable limits."
@@ -28,31 +28,38 @@ def interpret_impact(prediction):
     else:
         return "Unsafe: Emissions are too high, leading to severe consequences."
 
-# Function for prediction with scaling
+# Prediction function
 def predict_carbon_emissions(energy_consumption, gdp_ppp, energy_gdp_interaction):
     input_data = np.array([[energy_consumption, gdp_ppp, energy_gdp_interaction]])
-    st.write("Input data before scaling: ", input_data)  # Debugging: Print raw input data
+    
+    # Debugging: Inspect input before scaling
+    st.write("Input data before scaling:", input_data)
     
     if model is not None and scaler is not None:
-        # Apply scaling before prediction
+        # Apply scaling to the input data
         input_data_scaled = scaler.transform(input_data)
-        st.write("Scaled input data: ", input_data_scaled)  # Debugging: Print scaled input data
         
-        # Make the prediction using the scaled data
+        # Debugging: Inspect scaled input data
+        st.write("Scaled input data:", input_data_scaled)
+        
+        # Make prediction using the scaled input data
         prediction = model.predict(input_data_scaled)[0]
-        st.write("Raw prediction output: ", prediction)  # Debugging: Print raw prediction output
+        
+        # Debugging: Inspect raw prediction output
+        st.write("Raw prediction output:", prediction)
+        
         return prediction
     else:
         return None
 
-# Streamlit app layout
+# Streamlit App layout
 st.title("Carbon Emissions Prediction")
 
 st.write("""
 Enter your energy consumption, GDP, and energy-GDP interaction to predict per capita carbon emissions.
 """)
 
-# Input fields
+# Input fields for user
 energy_consumption = st.number_input("Per Capita Energy (kWh/year)", value=25100)
 gdp_ppp = st.number_input("Per Capita GDP (PPP USD/year)", value=52000)
 energy_gdp_interaction = st.number_input("Energy-GDP Interaction (combined metric)", value=15000)

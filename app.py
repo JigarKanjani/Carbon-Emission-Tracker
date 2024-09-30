@@ -3,21 +3,18 @@ import numpy as np
 import joblib
 import os
 
-# Load the XGBoost model and StandardScaler
+# Load the XGBoost model without scaler
 @st.cache_resource
-def load_model_and_scaler():
+def load_model():
     model_path = "xgb_model.pkl"
-    scaler_path = "scaler.pkl"
-    
-    if os.path.exists(model_path) and os.path.exists(scaler_path):
+    if os.path.exists(model_path):
         model = joblib.load(model_path)
-        scaler = joblib.load(scaler_path)
-        return model, scaler
+        return model
     else:
-        st.error("Model or Scaler file not found. Please upload 'xgb_model.pkl' and 'scaler.pkl'.")
-        return None, None
+        st.error("Model file not found. Please upload 'xgb_model.pkl'.")
+        return None
 
-model, scaler = load_model_and_scaler()
+model = load_model()
 
 # Function to interpret the impact levels based on prediction
 def interpret_impact(prediction):
@@ -28,22 +25,16 @@ def interpret_impact(prediction):
     else:
         return "Unsafe: Emissions are too high, leading to severe consequences."
 
-# Prediction function for 3 features
+# Prediction function (no scaler)
 def predict_carbon_emissions(energy_consumption, gdp_ppp, energy_gdp_interaction):
     input_data = np.array([[energy_consumption, gdp_ppp, energy_gdp_interaction]])
     
-    # Debugging: Inspect input before scaling
-    st.write("Input data before scaling:", input_data)
+    # Debugging: Inspect input before prediction
+    st.write("Input data before prediction:", input_data)
     
-    if model is not None and scaler is not None:
-        # Apply scaling to the input data
-        input_data_scaled = scaler.transform(input_data)
-        
-        # Debugging: Inspect scaled input data
-        st.write("Scaled input data:", input_data_scaled)
-        
-        # Make prediction using the scaled input data
-        prediction = model.predict(input_data_scaled)[0]
+    if model is not None:
+        # Make prediction using the model (no scaling)
+        prediction = model.predict(input_data)[0]
         
         # Debugging: Inspect raw prediction output
         st.write("Raw prediction output:", prediction)
@@ -74,18 +65,12 @@ if st.button("Predict Carbon Emissions"):
         st.subheader(f"Predicted Per Capita Carbon Emissions: {prediction:.2f} tons/year")
         st.write(impact_text)
     else:
-        st.error("Prediction failed. Please ensure the model and scaler are loaded correctly.")
-
-# File uploader for model and scaler (Optional)
-st.write("If the model or scaler is missing, you can upload your own 'xgb_model.pkl' and 'scaler.pkl' files.")
+        st.error("Prediction failed. Please ensure the model is loaded correctly.")
+        
+# Optional: File uploader for the model (in case it's missing)
+st.write("If the model file is missing, you can upload your own 'xgb_model.pkl'.")
 uploaded_model = st.file_uploader("Choose a .pkl file for the model", type="pkl")
 if uploaded_model is not None:
     with open("xgb_model.pkl", "wb") as f:
         f.write(uploaded_model.read())
     st.success("Model file uploaded successfully. Please refresh the page.")
-
-uploaded_scaler = st.file_uploader("Choose a .pkl file for the scaler", type="pkl")
-if uploaded_scaler is not None:
-    with open("scaler.pkl", "wb") as f:
-        f.write(uploaded_scaler.read())
-    st.success("Scaler file uploaded successfully. Please refresh the page.")
